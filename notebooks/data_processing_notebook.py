@@ -3,15 +3,14 @@
 
 # COMMAND ----------
 
-dbutils.library.restartPython()
+# dbutils.library.restartPython()
 
 # COMMAND ----------
-import yaml
 import pandas as pd
+import yaml
+
 from Hotel_Reservation.config import ProjectConfig
 from Hotel_Reservation.data_processor import DataProcessor
-
-
 
 # Load configuration
 config = ProjectConfig.from_yaml(config_path="../project_config.yml")
