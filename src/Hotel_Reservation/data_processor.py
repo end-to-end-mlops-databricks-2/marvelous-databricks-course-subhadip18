@@ -1,5 +1,3 @@
-import datetime
-from datetime import datetime
 import pandas as pd
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, to_utc_timestamp
@@ -24,9 +22,7 @@ class DataProcessor:
 
         median_no_of_previous_cancellations = self.df["no_of_previous_cancellations"].median()
         self.df["no_of_previous_cancellations"].fillna(median_no_of_previous_cancellations, inplace=True)
-        current_year = datetime.now().year
 
-        
         # Handle numeric features
         num_features = self.config.num_features
         for col in num_features:

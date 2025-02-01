@@ -6,12 +6,11 @@
 dbutils.library.restartPython()
 
 # COMMAND ----------
-
 import yaml
-
-from Hotel_Reservation.data_processor import DataProcessor
+import pandas as pd
 from Hotel_Reservation.config import ProjectConfig
-from Hotel_Reservation.utils import adjust_predictions
+from Hotel_Reservation.data_processor import DataProcessor
+
 
 
 # Load configuration
@@ -21,7 +20,7 @@ print("Configuration loaded:")
 print(yaml.dump(config, default_flow_style=False))
 
 # COMMAND ----------
-import pandas as pd
+
 # Initialize DataProcessor
 filepath = "/Volumes/mlops_dev/subhadip/hotel_reservation_data/Hotel_Reservations.csv"
 # Load the data
@@ -43,5 +42,5 @@ print("Test set shape:", X_test.shape)
 if 'spark' not in locals():
     from pyspark.sql import SparkSession
     spark = SparkSession.builder.getOrCreate()
-    
+
 data_processor.save_to_catalog(X_train, X_test,spark)

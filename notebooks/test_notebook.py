@@ -9,17 +9,9 @@
 # MAGIC First, let's import all the necessary libraries.
 
 # COMMAND ----------
-
 import pandas as pd
-import datetime
-import yaml 
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.impute import SimpleImputer
-from sklearn.metrics import mean_squared_error, r2_score
+import yaml
 from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 # COMMAND ----------
 
@@ -49,7 +41,6 @@ print(num_features)
 
 # COMMAND ----------
 
-from datetime import datetime
 # Remove rows with missing target
 
 # Handle missing values and convert data types as needed
@@ -60,7 +51,6 @@ df["avg_price_per_room"] = pd.to_numeric(df["avg_price_per_room"], errors="coerc
 
 median_no_of_previous_cancellations = df["no_of_previous_cancellations"].median()
 df["no_of_previous_cancellations"].fillna(median_no_of_previous_cancellations, inplace=True)
-current_year = datetime.now().year
 
 # Handle numeric features
 num_features = config.get('num_features')
@@ -84,7 +74,7 @@ for cat_col in cat_features:
 
 # Extract target and relevant features
 target = config.get('target')
-# relevant_columns = cat_features + num_features + [target] 
+# relevant_columns = cat_features + num_features + [target]
 
 df["Id"] = range(1, len(df) + 1)
 relevant_columns = cat_features + num_features + [target] + ["Id"]
