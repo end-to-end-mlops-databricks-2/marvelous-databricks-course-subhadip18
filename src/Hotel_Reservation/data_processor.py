@@ -31,11 +31,11 @@ class DataProcessor:
         # Fill missing values with mean or default values
         self.df.fillna(
             {
-        "no_of_children": self.df["no_of_children"].mean(),
-        "type_of_meal_plan": "None",
-        "no_of_special_requests": 0,
+                "no_of_children": self.df["no_of_children"].mean(),
+                "type_of_meal_plan": "None",
+                "no_of_special_requests": 0,
             },
-        inplace=True,
+            inplace=True,
         )
 
         # Convert categorical features to the appropriate type
