@@ -1,5 +1,4 @@
 # Databricks notebook source
-from loguru import logger
 
 import mlflow
 from pyspark.sql import SparkSession
