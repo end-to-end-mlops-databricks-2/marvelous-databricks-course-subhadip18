@@ -1,6 +1,8 @@
 catalog_name: mlops_dev
 schema_name: subhadip
-
+experiment_name_basic: /Shared/hotel_reservation-basic
+experiment_name_custom: /Shared/hotel_reservation-custom
+experiment_name_fe: /Shared/hotel_reservation-fe
 
 parameters:
   learning_rate: 0.01

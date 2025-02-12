@@ -45,6 +45,8 @@ class DataProcessor:
 
         # Extract target and relevant features
         target = self.config.target
+        self.df[target] = self.df[target].replace({"Not_Canceled": 0, "Canceled": 1})
+        self.df[target] = pd.to_numeric(self.df[target], errors="coerce")
 
         self.df["Id"] = range(1, len(self.df) + 1)
         relevant_columns = cat_features + num_features + [target] + ["Id"]
