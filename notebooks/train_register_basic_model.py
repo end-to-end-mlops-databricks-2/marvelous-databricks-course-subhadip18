@@ -1,5 +1,11 @@
 # Databricks notebook source
 
+# Databricks notebook source
+# MAGIC %pip install /Volumes/mlops_dev/subhadip/hotel_reservation_data/Hotel_Reservation-0.0.1-py3-none-any.whl --force-reinstall
+
+# COMMAND ----------
+# dbutils.library.restartPython()
+# COMMAND ----------
 import mlflow
 from pyspark.sql import SparkSession
 
