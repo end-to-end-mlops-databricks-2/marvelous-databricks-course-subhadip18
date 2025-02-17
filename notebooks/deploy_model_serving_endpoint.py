@@ -12,6 +12,7 @@ from typing import Dict, List
 import requests
 from pyspark.dbutils import DBUtils
 from pyspark.sql import SparkSession
+
 from Hotel_Reservation.config import ProjectConfig
 from Hotel_Reservation.serving.model_serving import ModelServing
 
@@ -30,7 +31,8 @@ schema_name = config.schema_name
 # COMMAND ----------
 # Initialize feature store manager
 model_serving = ModelServing(
-    model_name=f"{catalog_name}.{schema_name}.hotel_reservation_model_basic", endpoint_name="hotel_reservation_model-serving"
+    model_name=f"{catalog_name}.{schema_name}.hotel_reservation_model_basic",
+    endpoint_name="hotel_reservation_model-serving",
 )
 
 # COMMAND ----------
@@ -40,23 +42,23 @@ model_serving.deploy_or_update_serving_endpoint()
 # COMMAND ----------
 # Create a sample request body
 required_columns = [
-"no_of_adults",
-"no_of_children",
-"no_of_weekend_nights",
-"no_of_week_nights",
-"required_car_parking_space",
-"lead_time",
-"arrival_year",
-"arrival_month",
-"arrival_date",
-"repeated_guest",
-"no_of_previous_cancellations",
-"no_of_previous_bookings_not_canceled",
-"avg_price_per_room",
-"no_of_special_requests",
-"type_of_meal_plan",
-"room_type_reserved",
-"market_segment_type",
+    "no_of_adults",
+    "no_of_children",
+    "no_of_weekend_nights",
+    "no_of_week_nights",
+    "required_car_parking_space",
+    "lead_time",
+    "arrival_year",
+    "arrival_month",
+    "arrival_date",
+    "repeated_guest",
+    "no_of_previous_cancellations",
+    "no_of_previous_bookings_not_canceled",
+    "avg_price_per_room",
+    "no_of_special_requests",
+    "type_of_meal_plan",
+    "room_type_reserved",
+    "market_segment_type",
 ]
 
 test_set = spark.table(f"{config.catalog_name}.{config.schema_name}.test_set").toPandas()
@@ -78,7 +80,8 @@ Each dataframe record in the request body should be list of json with columns lo
   'required_car_parking_space': 1}]
 """
 
-def call_endpoint(endpoint_name: str,record: List[Dict]):
+
+def call_endpoint(endpoint_name: str, record: List[Dict]):
     """
     Calls the model serving endpoint with a given input record.
     """
@@ -91,13 +94,14 @@ def call_endpoint(endpoint_name: str,record: List[Dict]):
     )
     return response.status_code, response.text
 
-status_code, response_text = call_endpoint('hotel_reservation_model-serving',dataframe_records[0])
+
+status_code, response_text = call_endpoint("hotel_reservation_model-serving", dataframe_records[0])
 print(f"Response Status: {status_code}")
 print(f"Response Text: {response_text}")
 
-# COMMAND ----------
+# COMMAND ---------
 # "load test"
 
 for i in range(len(dataframe_records)):
-    call_endpoint('hotel_reservation_model-serving',dataframe_records[i])
+    call_endpoint("hotel_reservation_model-serving", dataframe_records[i])
     time.sleep(0.2)

@@ -5,6 +5,7 @@ from databricks.sdk.service.serving import (
     ServedEntityInput,
 )
 
+
 class ModelServing:
     def __init__(self, model_name: str, endpoint_name: str):
         """
@@ -19,7 +20,7 @@ class ModelServing:
         latest_version = client.get_model_version_by_alias(self.model_name, alias="latest-model").version
         print(f"Latest model version: {latest_version}")
         return latest_version
-    
+
     def deploy_or_update_serving_endpoint(
         self, version: str = "latest", workload_size: str = "Small", scale_to_zero: bool = True
     ):

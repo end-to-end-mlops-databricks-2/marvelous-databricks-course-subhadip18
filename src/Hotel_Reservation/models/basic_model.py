@@ -128,7 +128,7 @@ class BasicModel:
             name=f"{self.catalog_name}.{self.schema_name}.hotel_reservation_model_basic",
             tags=self.tags,
         )
-        logger.info(f"✅ Model registered as version {registered_model.version}.") 
+        logger.info(f"✅ Model registered as version {registered_model.version}.")
 
         latest_version = registered_model.version
 
