@@ -18,6 +18,8 @@ from Hotel_Reservation.serving.model_serving import ModelServing
 
 spark = SparkSession.builder.getOrCreate()
 dbutils = DBUtils(spark)
+model_version = dbutils.jobs.taskValues.get(taskKey="train_model", key="model_version")
+
 
 # get environment variables
 os.environ["DBR_TOKEN"] = dbutils.notebook.entry_point.getDbutils().notebook().getContext().apiToken().get()
@@ -37,7 +39,7 @@ model_serving = ModelServing(
 
 # COMMAND ----------
 # Deploy the model serving endpoint
-model_serving.deploy_or_update_serving_endpoint()
+model_serving.deploy_or_update_serving_endpoint(model_version)
 
 # COMMAND ----------
 # Create a sample request body
