@@ -45,7 +45,7 @@ resources:
             autoscale:
               min_workers: 1
               max_workers: 1
-        
+
       tasks:
         - task_key: "preprocessing"
           job_cluster_key: "hotel-reservation-cluster"
@@ -60,7 +60,7 @@ resources:
            - whl: ./dist/*.whl
         - task_key: "train_model"
           job_cluster_key: "hotel-reservation-cluster"
-          depends_on: 
+          depends_on:
             - task_key: "preprocessing"
           spark_python_task:
             python_file: "scripts/train_register_model.py"
@@ -75,17 +75,17 @@ resources:
               - "{{job.id}}"
               - "--branch"
               - ${var.branch}
-          libraries: 
+          libraries:
             - whl: ./dist/*.whl
         - task_key: model_updated
           condition_task:
             op: "EQUAL_TO"
             left: "{{tasks.train_model.values.model_updated}}"
             right: "1"
-          depends_on: 
+          depends_on:
             - task_key: "train_model"
         - task_key: "deploy_model"
-          depends_on: 
+          depends_on:
             - task_key: "model_updated"
               outcome: "true"
           job_cluster_key: "hotel-reservation-cluster"
@@ -95,8 +95,8 @@ resources:
               - "--root_path"
               - ${workspace.root_path}
               - "--env"
-              - ${bundle.target}             
-          libraries: 
+              - ${bundle.target}
+          libraries:
             - whl: ./dist/*.whl
 
 

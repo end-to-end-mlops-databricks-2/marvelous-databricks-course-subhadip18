@@ -1,12 +1,12 @@
-import mlflow
-from pyspark.sql import SparkSession
-from loguru import logger
 import argparse
+
+import mlflow
+from loguru import logger
 from pyspark.dbutils import DBUtils
+from pyspark.sql import SparkSession
+
 from Hotel_Reservation.config import ProjectConfig, Tags
 from Hotel_Reservation.models.basic_model import BasicModel
-
-
 
 # Default profile:
 mlflow.set_tracking_uri("databricks")
@@ -94,11 +94,10 @@ basic_model.retrieve_current_run_dataset()
 basic_model.retrieve_current_run_metadata()
 
 
-
 test_set = spark.table(f"{config.catalog_name}.{config.schema_name}.test_set").limit(100)
 
 model_improved = basic_model.model_improved(test_set=test_set.toPandas())
-logger.info("Model evaluation completed, model improved: ", model_improved) 
+logger.info("Model evaluation completed, model improved: ", model_improved)
 
 if model_improved:
     # Register the model
@@ -109,5 +108,3 @@ if model_improved:
 
 else:
     dbutils.jobs.taskValues.set(key="model_updated", value=0)
-
-

@@ -15,8 +15,8 @@ srcs = w.data_sources.list()
 
 
 alert_query = """
-SELECT 
-  (case when accuracy_score < 0.6 then 1 else 0 end) as bad_model 
+SELECT
+  (case when accuracy_score < 0.6 then 1 else 0 end) as bad_model
 FROM (
   SELECT
     concat(window.start, " - ", window.end) AS Window,
@@ -31,28 +31,33 @@ FROM (
     AND log_type = "INPUT"
     AND ROUND(accuracy_score, 2) is not null
     AND `model_name` = "hotel_reservation_model_basic"
-  GROUP BY 
+  GROUP BY
     window.start, window.end, granularity, `model_name`, slice_key, slice_value
 )"""
 
 
-query = w.queries.create(query=sql.CreateQueryRequestQuery(display_name=f'hotel-reservation-alert-query-{time.time_ns()}',
-                                                           warehouse_id=srcs[0].warehouse_id,
-                                                           description="Alert on hotel reservation model",
-                                                           query_text=alert_query))
+query = w.queries.create(
+    query=sql.CreateQueryRequestQuery(
+        display_name=f"hotel-reservation-alert-query-{time.time_ns()}",
+        warehouse_id=srcs[0].warehouse_id,
+        description="Alert on hotel reservation model",
+        query_text=alert_query,
+    )
+)
 
 alert = w.alerts.create(
-    alert=sql.CreateAlertRequestAlert(condition=sql.AlertCondition(operand=sql.AlertConditionOperand(
-        column=sql.AlertOperandColumn(name="Accuracy_less_than_0.6"),),
+    alert=sql.CreateAlertRequestAlert(
+        condition=sql.AlertCondition(
+            operand=sql.AlertConditionOperand(
+                column=sql.AlertOperandColumn(name="Accuracy_less_than_0.6"),
+            ),
             op=sql.AlertOperator.GREATER_THAN,
-            threshold=sql.AlertConditionThreshold(
-                value=sql.AlertOperandValue(
-                    double_value=45))),
-            display_name=f'hotel-reservation-mae-alert-{time.time_ns()}',
-            query_id=query.id
-        )
+            threshold=sql.AlertConditionThreshold(value=sql.AlertOperandValue(double_value=45)),
+        ),
+        display_name=f"hotel-reservation-mae-alert-{time.time_ns()}",
+        query_id=query.id,
     )
-
+)
 
 
 # COMMAND ----------

@@ -1,10 +1,10 @@
 import argparse
+
 from databricks.connect import DatabricksSession
 from databricks.sdk import WorkspaceClient
 
 from Hotel_Reservation.config import ProjectConfig
 from Hotel_Reservation.monitoring import create_or_refresh_monitoring
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

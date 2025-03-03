@@ -4,7 +4,7 @@ from lightgbm import LGBMClassifier
 from loguru import logger
 from mlflow import MlflowClient
 from mlflow.models import infer_signature
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import SparkSession
 from sklearn.compose import ColumnTransformer
 
 # from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score

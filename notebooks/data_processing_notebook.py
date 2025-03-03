@@ -6,9 +6,11 @@
 # dbutils.library.restartPython()
 
 # COMMAND ----------
+import logging
+
 import pandas as pd
 import yaml
-import logging
+
 from Hotel_Reservation.config import ProjectConfig
 from Hotel_Reservation.data_processor import DataProcessor, generate_synthetic_data
 
@@ -40,6 +42,7 @@ synthetic_df = generate_synthetic_data(pandas_df, num_rows=100)
 
 if "spark" not in locals():
     from pyspark.sql import SparkSession
+
     spark = SparkSession.builder.getOrCreate()
 
 # Initialize DataProcessor

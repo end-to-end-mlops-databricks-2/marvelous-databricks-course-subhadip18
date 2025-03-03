@@ -1,7 +1,9 @@
-import pandas as pd
 import argparse
+
+import pandas as pd
 import yaml
 from loguru import logger
+
 from Hotel_Reservation.config import ProjectConfig
 from Hotel_Reservation.data_processor import DataProcessor, generate_synthetic_data
 
@@ -51,6 +53,7 @@ logger.info("Synthetic data generated")
 
 if "spark" not in locals():
     from pyspark.sql import SparkSession
+
     spark = SparkSession.builder.getOrCreate()
 
 # Initialize DataProcessor
@@ -72,6 +75,5 @@ print("Training set shape:", X_train.shape)
 print("Test set shape:", X_test.shape)
 
 
-    
 logger.info("Saving data to catalog")
 data_processor.save_to_catalog(X_train, X_test)
