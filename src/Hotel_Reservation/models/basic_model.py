@@ -125,7 +125,7 @@ class BasicModel:
         logger.info("🔄 Registering the model in UC...")
         registered_model = mlflow.register_model(
             model_uri=f"runs:/{self.run_id}/lightgbm-pipeline-model",
-            name=f"{self.catalog_name}.{self.schema_name}.house_prices_model_basic",
+            name=f"{self.catalog_name}.{self.schema_name}.hotel_reservation_model_basic",
             tags=self.tags,
         )
         logger.info(f"✅ Model registered as version {registered_model.version}.")
@@ -134,10 +134,12 @@ class BasicModel:
 
         client = MlflowClient()
         client.set_registered_model_alias(
-            name=f"{self.catalog_name}.{self.schema_name}.house_prices_model_basic",
+            name=f"{self.catalog_name}.{self.schema_name}.hotel_reservation_model_basic",
             alias="latest-model",
             version=latest_version,
         )
+
+        return latest_version
 
     def retrieve_current_run_dataset(self):
         """
@@ -169,7 +171,7 @@ class BasicModel:
         """
         logger.info("🔄 Loading model from MLflow alias 'production'...")
 
-        model_uri = f"models:/{self.catalog_name}.{self.schema_name}.house_prices_model_basic@latest-model"
+        model_uri = f"models:/{self.catalog_name}.{self.schema_name}.hotel_reservation_model_basic@latest-model"
         model = mlflow.sklearn.load_model(model_uri)
 
         logger.info("✅ Model successfully loaded.")
@@ -179,3 +181,34 @@ class BasicModel:
 
         # Return predictions as a DataFrame
         return predictions
+
+    def model_improved(self, test_set: pd.DataFrame):
+        """
+        Evaluate the model performance on the test set.
+        """
+        logger.info("🔄 Evaluating model performance...")
+        X_test = test_set.drop(self.config.target, axis=1)
+        y_test = test_set[self.config.target]
+
+        predictions_latest = self.load_latest_model_and_predict(X_test)
+
+        latest_accuracy = accuracy_score(y_test, predictions_latest)
+
+        current_model_uri = f"runs:/{self.run_id}/lightgbm-pipeline-model"
+
+        current_model = mlflow.sklearn.load_model(current_model_uri)
+
+        current_predictions = current_model.predict(X_test)
+
+        current_accuracy = accuracy_score(y_test, current_predictions)
+
+        # Compare models based on MAE
+        logger.info(f"Accuracy for Current Model: {current_accuracy}")
+        logger.info(f"Accuracy for Latest Model: {latest_accuracy}")
+
+        if current_accuracy > latest_accuracy:
+            logger.info("Current Model performs better. Registering new model.")
+            return True
+        else:
+            logger.info("New Model performs worse. Keeping the old model.")
+            return False

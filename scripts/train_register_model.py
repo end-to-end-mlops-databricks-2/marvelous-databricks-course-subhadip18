@@ -1,28 +1,12 @@
-# Databricks notebook source
-
-# Databricks notebook source
-# MAGIC %pip install /Volumes/mlops_dev/subhadip/hotel_reservation_data/Hotel_Reservation-0.0.1-py3-none-any.whl --force-reinstall
-
-# COMMAND ----------
-# dbutils.library.restartPython()
-# COMMAND ----------
-import logging
+import argparse
 
 import mlflow
+from loguru import logger
 from pyspark.dbutils import DBUtils
 from pyspark.sql import SparkSession
 
 from Hotel_Reservation.config import ProjectConfig, Tags
 from Hotel_Reservation.models.basic_model import BasicModel
-
-# COMMAND ----------
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
-
-if "spark" not in locals():
-    spark = SparkSession.builder.getOrCreate()
-dbutils = DBUtils(spark)
 
 # Default profile:
 mlflow.set_tracking_uri("databricks")
@@ -31,19 +15,69 @@ mlflow.set_registry_uri("databricks-uc")
 # mlflow.set_tracking_uri("databricks://course")
 # mlflow.set_registry_uri("databricks-uc://course")
 
-config = ProjectConfig.from_yaml(config_path="../project_config.yml")
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--root_path",
+    action="store",
+    default=None,
+    type=str,
+    required=True,
+)
+
+parser.add_argument(
+    "--env",
+    action="store",
+    default=None,
+    type=str,
+    required=True,
+)
+
+parser.add_argument(
+    "--git_sha",
+    action="store",
+    default=None,
+    type=str,
+    required=True,
+)
+
+parser.add_argument(
+    "--job_run_id",
+    action="store",
+    default=None,
+    type=str,
+    required=True,
+)
+
+parser.add_argument(
+    "--branch",
+    action="store",
+    default=None,
+    type=str,
+    required=True,
+)
+
+
+args = parser.parse_args()
+root_path = args.root_path
+config_path = f"{root_path}/files/project_config.yml"
+
+config = ProjectConfig.from_yaml(config_path=config_path, env=args.env)
 spark = SparkSession.builder.getOrCreate()
-tags = Tags(**{"git_sha": "abcd12345", "branch": "feature_subh_data_process"})
-# COMMAND ----------
+dbutils = DBUtils(spark)
+tags_dict = {"git_sha": args.git_sha, "branch": args.branch, "job_run_id": args.job_run_id}
+tags = Tags(**tags_dict)
+
 # Initialize model with the config path
 basic_model = BasicModel(config=config, tags=tags, spark=spark)
-
-# COMMAND ----------
+logger.info("Model initialized.")
 basic_model.load_data()
+logger.info("Loading Data completed")
 basic_model.prepare_features()
-# COMMAND ----------
+logger.info("Prepared Feature")
 basic_model.train()
+logger.info("Model Training Completed")
 basic_model.log_model()
+logger.info("Model Logging Completed")
 
 run_id = mlflow.search_runs(
     experiment_names=["/Shared/hotel_reservation-basic"], filter_string="tags.branch='feature_subh_data_process'"
@@ -51,16 +85,15 @@ run_id = mlflow.search_runs(
 
 model = mlflow.sklearn.load_model(f"runs:/{run_id}/lightgbm-pipeline-model")
 
-# COMMAND ----------
+
 # Retrieve dataset for the current run
 basic_model.retrieve_current_run_dataset()
 
-# COMMAND ----------
+
 # Retrieve metadata for the current run
 basic_model.retrieve_current_run_metadata()
 
 
-# COMMAND ----------
 test_set = spark.table(f"{config.catalog_name}.{config.schema_name}.test_set").limit(100)
 
 model_improved = basic_model.model_improved(test_set=test_set.toPandas())
@@ -75,17 +108,3 @@ if model_improved:
 
 else:
     dbutils.jobs.taskValues.set(key="model_updated", value=0)
-
-
-# COMMAND ----------
-# Register model
-# basic_model.register_model()
-
-# COMMAND ----------
-# Predict on the test set
-
-# test_set = spark.table(f"{config.catalog_name}.{config.schema_name}.test_set").limit(10)
-
-# X_test = test_set.drop(config.target).toPandas()
-
-# predictions_df = basic_model.load_latest_model_and_predict(X_test)

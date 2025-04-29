@@ -1,5 +1,5 @@
 [project]
-name = "Hotel-Reservation"
+name = "hotel_reservation"
 version = "0.0.1"
 description = "Hotel Reservation project"
 requires-python = ">=3.11, <3.12"
